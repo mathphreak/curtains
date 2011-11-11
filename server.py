@@ -2,6 +2,7 @@ import tornado.ioloop
 import tornado.web
 import sqlite3
 import pystache
+import os.path
 
 conn = sqlite3.connect("assets/data.db")
 
@@ -28,24 +29,39 @@ pathoggv VARCHAR)""")
         c.execute("select * from movies where id=?", (target,))
         return tuple(c)
 
+class WatchTemplate(pystache.View):
+    
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("Hello, world")
 
+class FaviconHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write("")
+
+class VideoHandler(tornado.web.RequestHandler):
+    def get(self, target):
+        self.write("")
+
 class SpecificHandler(tornado.web.RequestHandler):
-    def __init__(self):
-        super(tornado.web.RequestHandler, self).__init__(self)
+    def initialize(self):
         template = open("assets/template.html")
         self.templatestring = template.read()
     
-    def get(self):
-        result = pystache.render()
-        self.write("Hello, world")
+    def get(self, target):
+        result = pystache.render(self.templatestring, DB.get(target))
+        self.write("You picked video number {0}".format(target))
 
 application = tornado.web.Application([
     (r"/", MainHandler),
+    (r"/favicon\.ico", FaviconHandler),
+    (r"/videojs/(*)"
+    (r"/videos/([a-z\.]+)", VideoHandler),
+    (r"/view/([0-9]+)", SpecificHandler)
 ])
 
 if __name__ == "__main__":
+    DB.checkInit()
     application.listen(8888)
     tornado.ioloop.IOLoop.instance().start()
