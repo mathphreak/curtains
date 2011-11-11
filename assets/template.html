@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>curtains - {{ name }}</title>
+  <title>curtains - {{name}}</title>
 
   <!-- Include the VideoJS Library -->
   <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
@@ -22,25 +22,25 @@
   <!-- Begin VideoJS -->
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video id="{{ name }}" class="video-js" controls="controls" preload="auto">
-      <source src="{{ path.mp4 }}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-      <source src="{{ path.webm }}" type='video/webm; codecs="vp8, vorbis"' />
-      <source src="{{ path.ogv }}" type='video/ogg; codecs="theora, vorbis"' />
+    <video id="{{name}}" class="video-js" controls="controls" preload="auto"> {{#path}}
+      <source src="{{mp4}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+      <source src="{{webm}}" type='video/webm; codecs="vp8, vorbis"' />
+      <source src="{{ogv}}" type='video/ogg; codecs="theora, vorbis"' />
       <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
       <object id="flash_fallback_1" class="vjs-flash-fallback" type="application/x-shockwave-flash"
         data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
         <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
         <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"playlist":[{"url": "{{ path.mp4 }}","autoPlay":false,"autoBuffering":true}]}' />
-      </object>
+        <param name="flashvars" value='config={"playlist":[{"url": "{{mp4}}","autoPlay":false,"autoBuffering":true}]}' />
+      </object>{{/path}}
     </video>
     <!-- Download links provided for devices that can't play video in the browser. -->
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="{{ path.mp4 }}">MP4</a>,
-      <a href="{{ path.webm }}">WebM</a>,
-      <a href="{{ path.ogv }}">Ogg</a><br>
+    <p class="vjs-no-video"><strong>Download Video:</strong>{{#path}}
+      <a href="{{mp4}}">MP4</a>,
+      <a href="{{webm}}">WebM</a>,
+      <a href="{{ogv}}">Ogg</a><br>
       <!-- Support VideoJS by keeping this link. -->
-      <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS
+      <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS{{/path}}
     </p>
   </div>
   <!-- End VideoJS -->
