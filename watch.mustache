@@ -5,7 +5,7 @@
   <title>curtains - {{name}}</title>
 
   <!-- Include the VideoJS Library -->
-  <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/video-js/video.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript">
     // Must come after the video.js library
@@ -15,14 +15,14 @@
   </script>
 
   <!-- Include the VideoJS Stylesheet -->
-  <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="screen" title="Video JS">
+  <link rel="stylesheet" href="/static/video-js/video-js.css" type="text/css" media="screen" title="Video JS">
 </head>
 <body>
 
   <!-- Begin VideoJS -->
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video id="{{name}}" class="video-js" controls="controls" preload="auto"> {{#path}}
+    <video id="{{name}}" class="video-js" controls="controls" preload="auto">
       <source src="{{mp4}}" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
       <source src="{{webm}}" type='video/webm; codecs="vp8, vorbis"' />
       <source src="{{ogv}}" type='video/ogg; codecs="theora, vorbis"' />
@@ -32,15 +32,15 @@
         <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
         <param name="allowfullscreen" value="true" />
         <param name="flashvars" value='config={"playlist":[{"url": "{{mp4}}","autoPlay":false,"autoBuffering":true}]}' />
-      </object>{{/path}}
+      </object>
     </video>
     <!-- Download links provided for devices that can't play video in the browser. -->
-    <p class="vjs-no-video"><strong>Download Video:</strong>{{#path}}
+    <p class="vjs-no-video"><strong>Download Video:</strong>
       <a href="{{mp4}}">MP4</a>,
       <a href="{{webm}}">WebM</a>,
       <a href="{{ogv}}">Ogg</a><br>
       <!-- Support VideoJS by keeping this link. -->
-      <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS{{/path}}
+      <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS
     </p>
   </div>
   <!-- End VideoJS -->

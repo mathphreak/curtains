@@ -3,19 +3,30 @@ import tornado.web
 import sqlite3
 import pystache
 import os.path
+import time
+import math
+
+video_file_extension = "mp4"
 
 conn = sqlite3.connect("assets/data.db")
 
-class DB:
+class DB:    
     @staticmethod
     def checkInit():
         c = conn.cursor()
         c.execute("""create table if not exists movies(
-id INTEGER PUBLIC KEY,
+id INTEGER PUBLIC KEY ASC,
 name VARCHAR,
-pathmpeg VARCHAR,
-pathwebm VARCHAR,
-pathoggv VARCHAR)""")
+file BLOB)""")
+
+    @staticmethod
+    def forceInit():
+        c = conn.cursor()
+        c.execute("drop table movies")
+        c.execute("""create table movies(
+id INTEGER PUBLIC KEY ASC,
+name VARCHAR,
+file BLOB)""")
     
     @staticmethod
     def getAll():
@@ -29,37 +40,84 @@ pathoggv VARCHAR)""")
         c.execute("select * from movies where id=?", (target,))
         return tuple(c)
 
-class WatchTemplate(pystache.View):
+    @staticmethod
+    def add(name, path):
+        maxx = max([idd for idd, name in DB.getAll()] + [-1])
+        file = open(path, mode="rb")
+        blob = file.read()
+        c = conn.cursor()
+        c.execute("insert into movies values(?, ?, ?)", (maxx + 1, name, blob))
+        return
+
+class Watch(pystache.View):
+    def __init__(self, tupl):
+        super(pystache.View, self).__init__()
+        self.context_list = []
+        self.formstr = "/videos/{0}.{1}?{2}"
+        try:
+            self.id, self.name, blob = tupl
+        except ValueError:
+            self.id = 3
+            self.name = ""
+
+    def __formt__(self, name):
+        return self.formstr.format(self.id, name, math.floor(time.time()))
+
+    def name(self):
+        return self.name
     
+    def mp4(self):
+        return self.__formt__("mp4")
+    
+    def webm(self):
+        return self.__formt__("webm")
+
+    def ogv(self):
+        return self.__formt__("ogv")
+
+class Index(pystache.View):
+    def movies(self):
+        formstr = "/view/{0}"
+        class MovieObject:
+            def __init__(self, idd, name):
+                self.id = idd
+                self.name = name
+
+            def watchpath(self):
+                return formstr.format(self.id)
+        
+        allMovies = DB.getAll()
+        return [MovieObject(idd, name) for idd, name in allMovies]
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("Hello, world")
+        result = Index().render()
+        self.write(result)
 
 class FaviconHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("")
 
 class VideoHandler(tornado.web.RequestHandler):
-    def get(self, target):
-        self.write("")
+    def get(self, target, ext):
+        print("GET /videos/", target, ".", ext, sep="")
+        if ext == video_file_extension:
+            self.write(DB.get(target)[2])
+            return
+        self.write(str(target) + " dot " + str(ext))
 
 class SpecificHandler(tornado.web.RequestHandler):
-    def initialize(self):
-        template = open("assets/template.html")
-        self.templatestring = template.read()
-    
     def get(self, target):
-        result = pystache.render(self.templatestring, DB.get(target))
-        self.write("You picked video number {0}".format(target))
+        print("GET /view/", target, sep="")
+        result = Watch(DB.get(target)).render()
+        self.write(result)
 
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/favicon\.ico", FaviconHandler),
-    (r"/videojs/(*)"
-    (r"/videos/([a-z\.]+)", VideoHandler),
+    (r"/videos/([0-9]+).(\w{3,4}).*", VideoHandler),
     (r"/view/([0-9]+)", SpecificHandler)
-])
+], static_path=os.path.join(os.path.dirname(__file__), "static"))
 
 if __name__ == "__main__":
     DB.checkInit()

@@ -20,7 +20,7 @@ class Loader(object):
         file_name = template_name + '.' + self.template_extension
 
         # Given a single directory we'll load from it
-        if isinstance(template_dirs, basestring):
+        if isinstance(template_dirs, str):
             file_path = os.path.join(template_dirs, file_name)
 
             return self._load_template_file(file_path)

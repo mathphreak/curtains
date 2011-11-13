@@ -36,10 +36,13 @@ class View(object):
         
     def get(self, attr, default=None):
         attr = get_or_attr(self.context_list, attr, getattr(self, attr, default))
-        if hasattr(attr, '__call__') and type(attr) is UnboundMethodType:
-            return attr()
-        else:
-            return attr
+        try:
+            if hasattr(attr, '__call__') and type(attr) in (MethodType, FunctionType):
+                return attr()
+            else:
+                return attr
+        except NameError as e:
+            print("Type of attribute is", type(attr), "you tried", e)
     
     def get_template(self, template_name):
         if not self.template:
