@@ -5,6 +5,7 @@ import pystache
 import os.path
 import time
 import math
+import shutil
 
 video_file_extension = "mp4"
 
@@ -43,10 +44,9 @@ file BLOB)""")
     @staticmethod
     def add(name, path):
         maxx = max([idd for idd, name in DB.getAll()] + [-1])
-        file = open(path, mode="rb")
-        blob = file.read()
+        shutil.copy2(path, "videos/" + str(maxx) + "." + path.split(".")[-1])
         c = conn.cursor()
-        c.execute("insert into movies values(?, ?, ?)", (maxx + 1, name, blob))
+        c.execute("insert into movies values(?, ?)", (maxx + 1, name))
         return
 
 class Watch(pystache.View):
@@ -115,7 +115,9 @@ class SpecificHandler(tornado.web.RequestHandler):
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/favicon\.ico", FaviconHandler),
-    (r"/videos/([0-9]+).(\w{3,4}).*", VideoHandler),
+    (r"/videos/([0-9]+\.\w{3,4}.*)", tornado.web.StaticFileHandler, dict(
+        path="videos"
+    )),
     (r"/view/([0-9]+)", SpecificHandler)
 ], static_path=os.path.join(os.path.dirname(__file__), "static"))
 
